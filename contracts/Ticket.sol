@@ -8,6 +8,8 @@ contract Tickets is AccessControl, ERC721 {
     using Counters for Counters.Counter;
 
     Counters.Counter private tickedID;
+        Counters.Counter private _saleTicketId;
+
     bytes32 public constant MINTER_ROLE = keccak256("MINTER_ROLE");
 
     uint128 public totalTicketSupply;
@@ -19,28 +21,46 @@ contract Tickets is AccessControl, ERC721 {
     struct Ticket {
         uint256 price;
         bool isSold;
+        uint ticketid;
     }
     mapping(uint256 => Ticket) ticketDetails;
-
-    constructor() ERC721("NFT Ticket Token", "NTT") {
+    
+    constructor(uint128 _totalTicketSupply, uint128 _ticketPrice, address _eventOrganiser) ERC721("NFT Ticket Token", "NTT") {
+        totalTicketSupply=_totalTicketSupply;
+        ticketPrice=_ticketPrice;
+        eventOrganiser=_eventOrganiser;
         _setupRole(MINTER_ROLE, eventOrganiser);
     }
-
-    function _createTicket() internal returns (uint256) {
+    
+    
+    
+        modifier isMinterRole {
         require(
-            hasRole(MINTER_ROLE, eventOrganiser),
-            "only owner can mint tickets"
+            hasRole(MINTER_ROLE, _msgSender()),
+            "only owner can mint"
         );
+        _;
+    }
+
+
+ function _createTicket() public isMinterRole returns (uint256) {
+     
         tickedID.increment();
         uint256 newTicketId = tickedID.current();
-        Ticket memory tickets = Ticket(ticketPrice, false);
+                _mint(msg.sender, newTicketId);
+
+        Ticket memory tickets = Ticket(ticketPrice, false,newTicketId);
         ticketDetails[newTicketId] = tickets;
         return newTicketId;
     }
 
-    function mintTickets() public {
-        uint256 _newTicketId = _createTicket();
-        _mint(msg.sender, _newTicketId);
+ 
+
+    function buyTickets() public payable{
+        _saleTicketId.increment();
+        uint256 saleTicketId = _saleTicketId.current();
+        payable(eventOrganiser).transfer(ticketPrice);
+        transferFrom(ownerOf(saleTicketId), msg.sender, saleTicketId);
     }
 
     function supportsInterface(bytes4 interfaceId)
