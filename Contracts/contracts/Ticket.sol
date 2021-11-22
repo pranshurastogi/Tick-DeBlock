@@ -20,10 +20,11 @@ contract Tickets is AccessControl, ERC721 {
 
     struct Ticket {
         uint256 price;
-        bool isSold;
-        uint ticketid;
+\        uint ticketid;
     }
     mapping(uint256 => Ticket) ticketDetails;
+    mapping(address => uint256[]) private purchasedTickets;
+
     
     constructor(uint128 _totalTicketSupply, uint128 _ticketPrice, address _eventOrganiser) ERC721("NFT Ticket Token", "NTT") {
         totalTicketSupply=_totalTicketSupply;
@@ -44,24 +45,43 @@ contract Tickets is AccessControl, ERC721 {
 
 
  function _createTicket() public isMinterRole returns (uint256) {
+       require(
+            tickedID.current() < totalTicketSupply,
+            "Maximum ticket limit exceeded!"
+        );
      
         tickedID.increment();
         uint256 newTicketId = tickedID.current();
                 _mint(msg.sender, newTicketId);
 
-        Ticket memory tickets = Ticket(ticketPrice, false,newTicketId);
+        Ticket memory tickets = Ticket(ticketPrice,newTicketId);
         ticketDetails[newTicketId] = tickets;
         return newTicketId;
     }
 
  
 
-    function buyTickets() public payable{
+    function buyTickets(address buyer) public payable{
+        buyer=msg.sender;
         _saleTicketId.increment();
         uint256 saleTicketId = _saleTicketId.current();
         payable(eventOrganiser).transfer(ticketPrice);
-        transferFrom(ownerOf(saleTicketId), msg.sender, saleTicketId);
+        transferFrom(ownerOf(saleTicketId), buyer, saleTicketId);
+             if (!isCustomerExist(buyer)) {
+            Buyers.push(buyer);
+        }
+        purchasedTickets[buyer].push(saleTicketId);
     }
+
+        function isCustomerExist(address buyer) internal view returns (bool) {
+        for (uint256 i = 0; i < Buyers.length; i++) {
+            if (Buyers[i] == buyer) {
+                return true;
+            }
+        }
+        return false;
+    }
+
 
     function supportsInterface(bytes4 interfaceId)
         public
