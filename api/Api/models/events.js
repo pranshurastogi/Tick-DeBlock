@@ -9,8 +9,5 @@ const eventSchema=mongoose.Schema({
     Price:{type: Array,required:true},
     Address:{type: String, required:true},
     totalSupply:Number
-
-
-    
 });
 module.exports=mongoose.model('Event',eventSchema);
