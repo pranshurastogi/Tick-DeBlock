@@ -8,7 +8,7 @@ const mongoose=require('mongoose')
 const eventsRoutes = require('./api/routes/events');
 
 
-//logging data
+//log data
 app.use(morgan('dev'));
 
 // parsing post request
