@@ -7,6 +7,7 @@ const mongoose=require('mongoose')
 
 const eventsRoutes = require('./api/routes/events');
 
+mongoose.connect('mongodb+srv://Ishita:Ishitaa@cluster0.aryi0.mongodb.net/myFirstDatabase?retryWrites=true&w=majority');
 
 //logging data
 app.use(morgan('dev'));

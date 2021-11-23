@@ -4,11 +4,22 @@ const Event=require('../models/events');
 const mongoose=require('mongoose')
 
 // Handle incoming GET requests to /orders
-router.get('/', (req, res, next) => {
-    res.status(200).json({
-        message: 'Events  fetched'
-    });
-});
+router.get("/", (req, res, next) => {
+    Event.find()
+      .exec()
+      .then(docs => {
+        console.log(docs);
+        res.status(200).json(docs);
+      
+      })
+      .catch(err => {
+        console.log(err);
+        res.status(500).json({
+          error: err
+        });
+      });
+  });
+  
 
 router.post("/", (req, res, next) => {
     const event = new Event({
@@ -37,12 +48,25 @@ router.post("/", (req, res, next) => {
       });
     });
   });
-router.get('/:eventId', (req, res, next) => {
-    res.status(200).json({
-        message: 'Event details',
-        eventId: req.params.eventId
-    });
-});
+  router.get("/:eventId", (req, res, next) => {
+    const id = req.params.eventId;
+    Event.findById(id)
+      .exec()
+      .then(doc => {
+        console.log(doc);
+        if (doc) {
+          res.status(200).json(doc);
+        } else {
+          res
+            .status(404)
+            .json({ message: "Invalid" });
+        }
+      })
+      .catch(err => {
+        console.log(err);
+        res.status(500).json({ error: err });
+      });
+  });
 
 router.patch('/:eventId', (req, res, next) => {
     res.status(200).json({
@@ -52,11 +76,20 @@ router.patch('/:eventId', (req, res, next) => {
 });
 
 
-router.delete('/:eventId', (req, res, next) => {
-    res.status(200).json({
-        message: 'Event deleted',
-        eventId: req.params.eventId
-    });
-});
+router.delete("/:eventId", (req, res, next) => {
+    const id = req.params.eventId;
+    Event.remove({ _id: id })
+      .exec()
+      .then(result => {
+        res.status(200).json(result);
+      })
+      .catch(err => {
+        console.log(err);
+        res.status(500).json({
+          error: err
+        });
+      });
+  });
+
 
 module.exports = router;
