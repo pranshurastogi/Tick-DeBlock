@@ -6,6 +6,7 @@ const bodyParser=require('body-parser')
 const mongoose=require('mongoose')
 
 const eventsRoutes = require('./api/routes/events');
+const user = require('./Api/routes/user')
 
 mongoose.connect('mongodb+srv://Ishita:Ishitaa@cluster0.aryi0.mongodb.net/myFirstDatabase?retryWrites=true&w=majority');
 
@@ -18,6 +19,7 @@ app.use(bodyParser.json());
 
 // Middleware
 app.use('/events', eventsRoutes);
+app.use(user)
 
 // Erroe handling
 app.use((req, res, next) => {
@@ -36,3 +38,5 @@ app.use((error, req, res, next) => {
 });
 
 module.exports = app;
+
+// env var at email file , user controller genauthTok, auth,js
