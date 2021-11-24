@@ -8,9 +8,8 @@ const mongoose=require('mongoose')
 const eventsRoutes = require('./api/routes/events');
 const user = require('./Api/routes/user')
 
-mongoose.connect('mongodb+srv://Ishita:Ishitaa@cluster0.aryi0.mongodb.net/myFirstDatabase?retryWrites=true&w=majority');
 
-//logging data
+//log data
 app.use(morgan('dev'));
 
 // parsing post request
